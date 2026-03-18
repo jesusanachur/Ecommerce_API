@@ -1,0 +1,26 @@
+# Entorno virtual
+venv/
+env/
+.venv/
+venv/
+
+
+# Python
+__pycache__/
+*.pyc
+
+# Base de datos
+db.sqlite3
+
+# Variables de entorno
+.env
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+
+
