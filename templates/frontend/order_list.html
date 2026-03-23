@@ -1,0 +1,71 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Mis pedidos - Ecommerce{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-list"></i> Mis pedidos</h1>
+        <p class="lead">Historial de todos tus pedidos</p>
+    </div>
+</div>
+
+{% if orders %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Tus pedidos recientes</h5>
+                </div>
+                <div class="card-body">
+                    {% for order in orders %}
+                        <div class="row mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="col-md-8">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6>Pedido #{{ order.id }}</h6>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-calendar"></i> {{ order.created_at|date:"d/m/Y H:i" }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'paid' %}info{% elif order.status == 'shipped' %}success{% else %}danger{% endif %}">
+                                                {% if order.status == 'pending' %}Pendiente{% elif order.status == 'paid' %}Pagado{% elif order.status == 'shipped' %}Enviado{% else %}Cancelado{% endif %}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="text-end">
+                                        <h5 class="text-primary">
+                                            ${{ order.items.all|aggregate:total_price }}
+                                        </h5>
+                                        <small class="text-muted">
+                                            {{ order.items.all|length }} producto{{ order.items.all|length|pluralize }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <a href="{% url 'frontend:order_detail' order.pk %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i> Ver detalles
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-list fa-3x mb-3"></i>
+                <h4>No tienes pedidos aún</h4>
+                <p>Una vez que realices tu primera compra, aparecerá aquí.</p>
+                <a href="{% url 'frontend:product_list' %}" class="btn btn-primary">
+                    <i class="fas fa-shopping-bag"></i> Ver productos
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

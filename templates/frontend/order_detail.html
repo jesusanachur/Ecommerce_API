@@ -1,0 +1,132 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Pedido #{{ order.id }} - Ecommerce{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'frontend:order_list' %}">Mis pedidos</a></li>
+                <li class="breadcrumb-item active">Pedido #{{ order.id }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-box"></i> Detalles del pedido #{{ order.id }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Fecha del pedido:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Estado:</strong> 
+                            <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'paid' %}info{% elif order.status == 'shipped' %}success{% else %}danger{% endif %}">
+                                {% if order.status == 'pending' %}Pendiente{% elif order.status == 'paid' %}Pagado{% elif order.status == 'shipped' %}Enviado{% else %}Cancelado{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>ID del pedido:</strong> #{{ order.id }}</p>
+                        <p><strong>Método de pago:</strong> Tarjeta de crédito</p>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6>Productos del pedido</h6>
+                {% for item in order.items.all %}
+                    <div class="row mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                        <div class="col-md-2">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" class="img-fluid rounded" alt="{{ item.product.name }}">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 60px;">
+                                    <i class="fas fa-image fa-lg text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6>{{ item.product.name }}</h6>
+                            <p class="text-muted small">{{ item.product.description|truncatewords:10 }}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <small class="text-muted">Cantidad:</small><br>
+                            <span class="badge bg-secondary">{{ item.quantity }}</span>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <small class="text-muted">Precio:</small><br>
+                            <strong>${{ item.price }}</strong>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calculator"></i> Resumen del pago</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span>${{ order.items.all|aggregate:total_price }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Envío:</span>
+                    <span>Gratis</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Impuestos:</span>
+                    <span>$0.00</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-3">
+                    <h5>Total:</h5>
+                    <h5 class="text-primary">${{ order.items.all|aggregate:total_price }}</h5>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    {% if order.status == 'pending' %}
+                        <button class="btn btn-success">
+                            <i class="fas fa-credit-card"></i> Pagar ahora
+                        </button>
+                    {% elif order.status == 'paid' %}
+                        <button class="btn btn-info" disabled>
+                            <i class="fas fa-clock"></i> Procesando pago
+                        </button>
+                    {% elif order.status == 'shipped' %}
+                        <button class="btn btn-primary">
+                            <i class="fas fa-truck"></i> Rastrear pedido
+                        </button>
+                    {% endif %}
+                    
+                    <a href="{% url 'frontend:order_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a mis pedidos
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-map-marker-alt"></i> Dirección de envío</h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">
+                    {{ user.first_name }} {{ user.last_name }}<br>
+                    Calle Ejemplo #123<br>
+                    Ciudad, País<br>
+                    Código Postal: 12345
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

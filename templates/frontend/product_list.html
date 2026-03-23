@@ -1,0 +1,78 @@
+{% extends 'frontend/base.html' %}
+
+{% block title %}Productos - Ecommerce{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-shopping-bag"></i> Nuestros productos</h1>
+        <p class="lead">Explora nuestra selección de productos de alta calidad</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for product in products %}
+        <div class="col-md-4 col-sm-6 mb-4">
+            <div class="card h-100">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description|truncatewords:30 }}</p>
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="text-primary mb-0">${{ product.price }}</h4>
+                            <span class="badge bg-{% if product.stock > 10 %}success{% elif product.stock > 0 %}warning{% else %}danger{% endif %}">
+                                {% if product.stock > 0 %}Stock: {{ product.stock }}{% else %}Agotado{% endif %}
+                            </span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'frontend:product_detail' product.pk %}" class="btn btn-primary">
+                                <i class="fas fa-eye"></i> Ver detalles
+                            </a>
+                            {% if user.is_authenticated and product.stock > 0 %}
+                                <a href="{% url 'frontend:add_to_cart' product.pk %}" class="btn btn-success">
+                                    <i class="fas fa-cart-plus"></i> Agregar al carrito
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <h4>No hay productos disponibles</h4>
+                <p>En este momento no tenemos productos en stock. Vuelve más tarde.</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% if products %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
